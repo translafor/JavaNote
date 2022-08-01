@@ -1,0 +1,76 @@
+@startuml
+
+user -> h5:新增活动
+
+user -> h5:编辑活动基本信息(标题、周期等)
+
+alt 有活动人群限制
+'编辑活动人群流程
+user -> h5:编辑活动人群
+activate h5
+
+h5 -> backend: 请求人群画像列表接口
+activate backend
+
+backend -> 大数据 :/segmenter/segmenter_list
+activate 大数据
+
+大数据 -> backend :人群信息列表
+deactivate 大数据
+
+backend -> h5: 返回标签列表
+deactivate backend
+
+h5 -> user:标签列表
+deactivate h5
+end
+
+'下一步相关逻辑
+user -> h5:下一步
+activate h5
+
+h5 -> backend: 活动新增接口
+activate backend
+
+backend -> h5: 活动id
+
+h5 -> backend: 活动详情接口
+
+backend -> h5: 活动详情
+deactivate backend
+
+h5 -> user:活动下一步保存后信息
+deactivate h5
+
+
+user -> h5:编辑策略信息
+alt 需要添加券选项
+user -> h5:编辑奖励信息
+activate h5
+
+h5 -> backend: 请求券列表接口
+activate backend
+
+backend -> 营销 : request
+activate 营销
+
+营销 -> backend :券相关信息
+deactivate 营销
+
+backend -> h5: 返回券列表
+deactivate backend
+h5 -> user :券选择列表
+deactivate h5
+end
+
+user -> h5:保存
+activate h5
+
+h5 -> backend: 修改策略接口
+activate backend
+
+backend -> h5: 操作结果
+deactivate backend
+h5 -> user :操作结果
+deactivate h5
+@enduml

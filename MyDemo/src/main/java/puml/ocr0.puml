@@ -1,0 +1,24 @@
+@startuml
+== 司机查询司机状态信息 ==
+客户端 -> driver: 司机状态接口(duty.status)
+
+activate driver
+
+driver -> driver_svc: 查询司机防疫信息(driver.health.check)
+
+driver_svc -> backend: 开城配置
+alt 未开城
+driver_svc -> driver: 不做处理
+end
+driver_svc -> mysql: 查询司机今天是否有防疫记录(xl_driver_ocr)
+alt 已有防疫记录
+driver_svc -> driver: 不做处理
+end
+
+driver_svc -> driver: 需要自动收车
+
+driver -> 客户端: 司机状态信息
+deactivate driver
+
+@enduml
+

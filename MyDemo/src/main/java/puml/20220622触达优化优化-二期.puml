@@ -1,0 +1,27 @@
+@startuml
+== 数据看板接口 ==
+
+participant Actor as "司机端"
+participant dcs
+'participant dcore as "xl-bme-dcore-svcc"
+participant dcore as "xl-bme-dcore-svc"
+participant behavior as "xl-risk-behavior-score-svc"
+participant dincome as "xl-bfe-dincome-svc"
+participant trade as "xl-bme-trade-api-svc"
+Actor -> dcs : driver.data.board
+activate dcs
+
+dcs -> Apollo: 获取需要展示的数据看板
+
+dcs -> dcs: 1. 线程池执行获取各项数据
+
+dcs-> behavior: 1.1 获取司机行为分
+
+dcs-> dincome: 1.2 获取司机收入
+
+dcs-> trade: 1.3 获取司机完单
+
+dcs-> dcs: 整合数据返回端上
+
+return
+@enduml

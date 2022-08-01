@@ -1,0 +1,26 @@
+@startuml
+
+start
+
+:交易推送订单事件消息;
+fork
+    :action==order_cancel
+             (取消订单);
+    :driver_id!=0
+    (已有司机接单);
+  fork again
+    :action==order_cancel
+             (更换司机);
+    :driver_id_history;
+  end fork
+:mqtt消息;
+:app;
+if (司机活跃在前台？) then (yes)
+  :语音播报+提示消息;
+else (no)
+  :展示提示消息;
+endif
+
+stop
+
+@enduml

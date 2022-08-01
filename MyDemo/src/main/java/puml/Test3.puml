@@ -1,0 +1,27 @@
+@startuml
+h5 -> 活动后台: 请求实时标签列表接口
+activate 活动后台
+
+活动后台 -> 大数据 :/segmenter/segmenter_list
+activate 大数据
+
+大数据 -> 活动后台 :人群信息列表
+deactivate 大数据
+
+活动后台 -> h5: 返回实时标签列表
+deactivate 活动后台
+
+
+
+
+'        alt 活动状态!=已上线
+'            backend -> other: 已下线
+'        else
+'          alt now < 开始时间
+'             backend -> other: 未上线
+'          else now > 结束时间
+'            backend -> other: 已下线
+'          else 结束时间 > now > 开始时间
+'            backend -> other: 已上线
+'          end
+@enduml

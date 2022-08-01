@@ -1,0 +1,28 @@
+@startuml
+
+
+
+
+
+
+h5 -> 活动后台: 分页信息、过滤条件
+activate 活动后台
+
+活动后台 -> 数据库 :获取活动列表
+
+活动后台 -> h5: 活动列表
+deactivate 活动后台
+
+
+
+'        alt 活动状态!=已上线
+'            backend -> other: 已下线
+'        else
+'          alt now < 开始时间
+'             backend -> other: 未上线
+'          else now > 结束时间
+'            backend -> other: 已下线
+'          else 结束时间 > now > 开始时间
+'            backend -> other: 已上线
+'          end
+@enduml

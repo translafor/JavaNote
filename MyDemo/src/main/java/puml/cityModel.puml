@@ -1,0 +1,50 @@
+@startuml
+
+
+participant Actor as "司机端"
+participant dcs
+'participant dcore as "xl-bme-dcore-svcc"
+participant ops as "xl-ops-common-svc"
+
+== 获取全部城市列表(带区信息的) ==
+Actor -> dcs : city.list.zone
+activate dcs
+
+dcs -> ops: index.php?_m=common&_a=get_city_zone_list
+
+dcs-> Actor: 城市列表
+deactivate dcs
+
+
+== 获取城市列表(已开城) ==
+Actor -> dcs : city.list.enable
+activate dcs
+
+dcs -> ops: _m=common&_a=city_list&biz_type=2
+
+dcs-> Actor: 城市列表
+deactivate dcs
+
+
+== 获取城市列表(全部) ==
+Actor -> dcs : city.list
+activate dcs
+
+dcs -> ops: _m=common&_a=all_city_list
+
+dcs-> Actor: 城市列表
+deactivate dcs
+
+
+== 根据中文名获取城市信息 ==
+Actor -> dcs : city.info（nameCn）
+activate dcs
+
+dcs -> ops: _m=common&_a=all_city_list
+
+dcs -> dcs: 根据所有城市+nameCn筛选对应的城市
+
+dcs-> Actor: 城市列表
+deactivate dcs
+
+@enduml

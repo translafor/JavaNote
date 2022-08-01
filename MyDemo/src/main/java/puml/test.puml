@@ -1,0 +1,162 @@
+@startuml
+== 新增活动逻辑 ==
+user -> h5:新增活动
+
+user -> h5:编辑活动基本信息(标题、周期等)
+
+alt 有活动人群限制-实时标签
+'编辑活动人群流程
+user -> h5:编辑活动人群-实时标签
+activate h5
+
+h5 -> 后台api: user.condition.query
+activate 后台api
+
+后台api -> 后台svc: getUserConditionList
+activate 后台svc
+
+后台svc -> 后台api :人群信息列表
+deactivate 后台svc
+
+后台api -> h5: 返回标签列表
+deactivate 后台api
+
+h5 -> user:标签列表
+deactivate h5
+end
+
+alt 有活动人群限制-城市
+'编辑活动人群流程
+user -> h5:编辑活动人群-城市
+activate h5
+
+h5 -> 后台api: city.list
+activate 后台api
+
+后台api -> Apollo :公共配置：xl_ops_common_city_info
+activate Apollo
+
+Apollo -> 后台api :城市列表
+deactivate Apollo
+
+后台api -> h5: 返回可选城市列表
+deactivate 后台api
+
+h5 -> user:城市列表
+deactivate h5
+end
+
+'下一步相关逻辑
+user -> h5:下一步
+activate h5
+
+h5 -> 后台api: activity.add
+activate 后台api
+
+后台api -> 后台svc: activityAdd
+
+activate 后台svc
+
+后台svc -> 数据库: 入库(xl_activity/xl_activity_extra/xl_activity_template\nxl_activity_ref_template/xl_activity_crowd/xl_activity_condition)
+
+后台svc -> 后台api: 活动详细信息(包含id)
+
+deactivate 后台svc
+
+后台api -> h5: 活动详细信息(包含id)
+
+deactivate 后台api
+
+h5 -> user:活动下一步保存后信息
+deactivate h5
+
+
+user -> h5:编辑策略信息
+alt 需要添加券选项
+user -> h5:编辑奖励信息
+activate h5
+
+h5 -> 后台api: getCouponInfoList
+activate 后台api
+
+后台api -> 后台svc : request
+activate 后台svc
+
+后台svc -> 后台api :券相关信息
+deactivate 后台svc
+
+后台api -> h5: 返回券列表
+deactivate 后台api
+h5 -> user :券选择列表
+deactivate h5
+end
+
+user -> h5:保存
+activate h5
+
+h5 -> 后台api: activity.strategy.update
+activate 后台api
+
+后台api -> 后台svc: updateStrategy
+activate 后台svc
+
+后台svc -> 数据库: xl_activity_strategy_version/xl_activity_strategy\nxl_activity_reward/xl_activity_reward_detail
+
+后台svc -> 后台api: 操作结果
+
+后台api -> 后台svc: operateActivity
+
+后台svc -> 数据库: 入库(xl_activity)
+
+后台svc -> 后台api: 操作结果
+deactivate 后台svc
+
+后台api -> h5: 操作结果
+deactivate 后台api
+h5 -> user :操作结果
+deactivate h5
+
+
+== 活动基本信息编辑 ==
+user->h5 :编辑修改活动基本信息
+user->h5 :下一步
+activate h5
+h5 -> 后台api: 活动基本信息修改接口
+activate 后台api
+
+后台api -> 后台svc: activityUpdate
+activate 后台svc
+
+后台svc -> 数据库 :xl_activity/xl_activity_extra/xl_activity_template\nxl_activity_ref_template/xl_activity_crowd/xl_activity_condition
+
+后台svc -> 后台api: 活动详细信息(包括id信息)
+
+deactivate 后台svc
+
+后台api -> h5: : 活动详细信息(包括id信息)
+deactivate 后台api
+h5->user:处理结果
+deactivate h5
+
+
+== 活动列表操作相关 ==
+user->h5 :条件查询活动列表
+activate h5
+h5 -> 后台api: activity.query.list
+activate 后台api
+
+后台api -> 后台svc: queryActivityList
+
+activate 后台svc
+
+后台svc -> 数据库 :获取活动列表
+
+后台svc -> 后台api :活动列表
+
+deactivate 后台svc
+
+后台api -> h5: 活动列表
+deactivate 后台api
+h5->user:活动列表
+deactivate h5
+@enduml

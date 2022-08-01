@@ -1,0 +1,50 @@
+@startuml
+'== 司机出车状态 ==
+'客户端 -> driver: 司机状态接口(duty.status)
+'
+'activate driver
+'
+'driver -> driver_svc: 查询司机防疫信息(driver.ocr.check)
+'driver_svc -> backend: 开城配置
+'alt 已开城
+'
+'driver_svc -> mysql: xl_driver_ocr表
+'end
+'
+'driver_svc -> driver: 司机防疫结果
+'
+'driver -> driver: 结果处理
+'
+'
+'driver -> 客户端: 司机状态信息
+'deactivate driver
+
+== 司机出车 ==
+客户端 -> driver: 出车(duty.update)
+
+activate driver
+
+driver -> 风控: 查询是否可以出车
+风控 -> driver_svc: 查询司机出车健康情况(driver.duty.health.check)
+driver_svc -> Apollo: 查询出车防疫城市名单
+alt 城市不在在名单中
+driver_svc->风控: 可以出车
+end
+driver_svc -> backend: 开城配置
+alt 未开城
+driver_svc -> 风控: 可以出车
+end
+driver_svc -> mysql: 查询司机今天是否有防疫记录(xl_driver_ocr)
+alt 已有防疫记录
+driver_svc -> 风控: 可以出车
+end
+driver_svc -> 风控: 不可以出车
+
+风控 -> driver: 司机是否可以出车
+
+
+driver -> 客户端: 司机出车结果
+deactivate driver
+
+@enduml
+

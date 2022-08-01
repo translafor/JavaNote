@@ -1,0 +1,31 @@
+@startuml
+title 一人多车司机自动收车
+
+participant Actor as "司机端"
+participant dapi
+'participant dcore as "xl-bme-dcore-svcc"
+participant dcore as "xl-bme-dcore-svc"
+participant trade as "xl-bme-trade-api-svc"
+participant rtc as "xl-rtc-station-svr"
+
+Actor -> dapi : duty.status
+activate dapi
+
+dapi -> driver_svc: 1. 查询该司机是否是一人多车，并返回绑定该车辆的其他司机
+
+dapi-> dcore: 2. 查询一人多车的其他司机是否处于出车状态
+
+dapi-> behavior: 3. 查询其他司机前30分钟是不是处于非活跃状态
+
+dapi-> trade: 4. 查询其他司机是否没有进行中的订单
+
+alt 其中有一项不满足，则不做处理
+dapi -> Actor
+end
+
+dapi-> dcore: 5. setDuty:自动收车
+
+dapi-> rtc: 6. 分别给其他司机发送push消息，提示自动收车
+
+return
+@enduml

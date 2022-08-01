@@ -1,0 +1,26 @@
+@startuml
+'== 司机启动app-查询abTest结果 ==
+'客户端 -> driver: 司机状态接口(duty.status)
+'
+'activate driver
+'driver -> abTest: 对司机id abTest
+'driver -> dcore: 更新司机app版本号
+'
+'
+'driver -> 客户端: abTest结果(orderAbTestResult,0:abTest已下线 1:对照组 2:实验组)
+'deactivate driver
+
+== 司机进入个人中心-查询接口 ==
+客户端 -> dcs: driverId,locationCityId,cityId
+
+activate dcs
+dcs -> apollo: 查询金刚位&更多服务的菜单配置
+
+
+dcs -> dcs: 通过cityId+配置条件表达式筛选需要展示的菜单
+
+
+dcs -> 客户端: 金刚位&更多服务菜单列表(url、name..)
+deactivate dcs
+
+@enduml

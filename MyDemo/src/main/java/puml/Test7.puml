@@ -1,0 +1,23 @@
+@startuml
+
+
+h5 -> 活动后台: 活动基本信息,活动策略信息
+activate 活动后台
+
+活动后台 -> 数据库 :更新该活动策略信息
+
+活动后台 -> h5: 操作结果
+deactivate 活动后台
+
+
+'        alt 活动状态!=已上线
+'            backend -> other: 已下线
+'        else
+'          alt now < 开始时间
+'             backend -> other: 未上线
+'          else now > 结束时间
+'            backend -> other: 已下线
+'          else 结束时间 > now > 开始时间
+'            backend -> other: 已上线
+'          end
+@enduml

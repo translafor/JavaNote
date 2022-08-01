@@ -1,0 +1,28 @@
+@startuml
+== xl-bfe-dic-api ==
+客户端 -> dic: logout
+
+activate dic
+dic -> kafka:退登消息(driverId)
+
+dic -> dcore: 退出登录
+
+dic -> 客户端: 退出成功
+
+deactivate dic
+
+== xl-bfe-driver-api ==
+
+driver -> kafka:监听kafka消息
+activate driver
+kafka -> driver:driverId
+
+driver -> dcore: 获取出车状态
+dcore -> driver: 出车状态
+
+alt 出车状态==出车
+driver -> dcore: 收车
+end
+deactivate driver
+
+@enduml

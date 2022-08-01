@@ -1,0 +1,10 @@
+@startuml
+== 后台导出司机防疫图片 ==
+
+backend -> driver_svc: pagesize、cityId、时间、图片类型等
+
+driver_svc -> mysql: xl_driver_ocr_image表
+
+driver_svc -> backend: 图片链接
+@enduml
+

@@ -1,0 +1,26 @@
+@startuml
+
+h5 -> 活动后台: 请求券列表接口
+activate 活动后台
+
+活动后台 -> 营销 : request
+activate 营销
+
+营销 -> 活动后台 :券相关信息
+deactivate 营销
+
+活动后台 -> h5: 返回券列表
+deactivate 活动后台
+
+
+'        alt 活动状态!=已上线
+'            backend -> other: 已下线
+'        else
+'          alt now < 开始时间
+'             backend -> other: 未上线
+'          else now > 结束时间
+'            backend -> other: 已下线
+'          else 结束时间 > now > 开始时间
+'            backend -> other: 已上线
+'          end
+@enduml

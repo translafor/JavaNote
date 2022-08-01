@@ -1,0 +1,44 @@
+@startuml
+
+
+
+h5 -> backend: 下一步调用保存接口
+activate backend
+
+backend -> 数据库 :活动基本信息
+backend -> 数据库 :活动人群信息
+
+backend -> h5: 活动id
+deactivate backend
+
+
+
+h5 -> backend: 活动详情接口
+activate backend
+
+backend -> 数据库 :获取活动详情
+
+backend -> h5: 活动详细信息
+deactivate backend
+
+
+h5 -> backend: 活动save接口
+activate backend
+
+backend -> 数据库 :更新该活动策略信息
+
+backend -> h5: 操作结果
+deactivate backend
+
+
+'        alt 活动状态!=已上线
+'            backend -> other: 已下线
+'        else
+'          alt now < 开始时间
+'             backend -> other: 未上线
+'          else now > 结束时间
+'            backend -> other: 已下线
+'          else 结束时间 > now > 开始时间
+'            backend -> other: 已上线
+'          end
+@enduml

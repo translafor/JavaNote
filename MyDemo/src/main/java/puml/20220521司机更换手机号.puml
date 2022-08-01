@@ -1,0 +1,75 @@
+@startuml
+
+
+participant Actor as "司机端"
+participant dic
+participant statistics as "xl-bfe-statistics-access-svc"
+participant dcore as "xl-bme-dcore-svc"
+== 下一步接口流程 ==
+Actor -> dic : 下一步
+activate dapi
+
+dic -> statistics: 查询该设备今日提交验证次数（设备id) num
+dic -> Apollo: 今日提交验证次数上限
+alt num>5 (Apollo配置)
+dic -> Actor: 提交验证次数已经达到上限XX次了
+end
+
+dic -> driver_svc: 通过身份证查询司机信息：身份证号
+
+dic -> statistics: 今日提交验证次数+1
+
+alt 结果为空/认证未通过
+dic -> Actor: 身份证填写有误，请检查后填写
+end
+
+dic -> statistics: 查询该设备今日验证通过次数（设备id) num
+dic -> Apollo: 今日验证通过次数上限
+alt num>3 (Apollo配置)
+dic -> Actor: 验证成功次数已经达到上限XX次了
+end
+note left of dic
+有了第一层检测后，这个是否还有必要？
+end note
+
+dic -> statistics: 今日验证通过次数+1
+
+== 人脸识别流程 ==
+note right of dic
+同之前出车人脸逻辑
+end note
+
+== 发送手机验证码 ==
+Actor -> dic : 发送验证码（参数：身份证号+手机号）
+dic -> driver_svc: 根据身份证号查询司机手机号
+dic -> dic : 检测两种手机号是否一样
+alt 一样
+dic -> Actor: 新旧手机号不能相同
+end
+
+dic -> dic : check手机号格式
+alt 格式不正确
+dic -> Actor: 请输入有效的手机号
+end
+dic -> Apollo: 虚拟号公共配置
+dic -> dic: 检测是否为虚拟号：读取Apollo配置
+alt 是虚拟号
+dic -> Actor: 您输入的新手机号为虚拟号，请填写其他手机号
+end
+
+dic->dcore: 发送验证码：index?_m=send_sms_code
+
+
+== 绑定 ==
+dic -> statistics : 根据设备号查询验证码错误次数
+alt 次数>10(Apollo配置))
+dic -> Actor: 验证码错误次数过多，请24小时后再试
+end
+dic -> statistics: 验证码错误次数+1
+dic -> dcore: 检测验证码：index?_m=verify_sms_code
+alt 验证码错误
+dic -> Actor: 验证码错误
+end
+dic -> dcore: 更换手机号
+
+@enduml

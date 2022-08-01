@@ -1,0 +1,31 @@
+@startuml
+== 手动job同步历史数据 ==
+job -> driverSync: 执行job(日期)
+
+activate driverSync
+driverSync -> xl_driver: select id,driver_id,name.. from vandriver order by driver_id limit 200
+
+xl_driver -> driverSync: id,driver_id,name..列表
+
+driverSync -> driverSync: 组装driverId list
+
+driverSync -> xl_driver: 根据driverId列表查询t_driver_ext/t_driver_vehicle/\n    t_driver_join/t_driver_bank/vanimage
+
+driverSync -> driverSync: 组装xl_bfe_driver表DO
+
+driverSync -> xl_bfe_driver: 入库
+
+alt 发生异常
+driverSync -> kafka: 异常发送kafka消息(driver_id（start->end）)
+end
+== kafka失败补偿 ==
+
+driverSync -> kafka: 消费driver修复失败消息
+driverSync -> driverSync : 根据消息内容，补偿指定的driver记录
+alt 依旧异常
+driverSync -> xl_bfe_driver: 失败记录落库
+end
+
+== 定时job读取失败日志补偿 ==
+deactivate driverSync
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+title 司机出车状态信息
+
+participant Actor as "司机端"
+participant dapi
+'participant dcore as "xl-bme-dcore-svcc"
+participant dcore as "xl-bme-dcore-svc"
+
+Actor -> dapi : duty.status
+activate dapi
+
+dapi -> dapi: 1. 线程池执行前置处理handler
+
+dapi-> dcore: 1.1 司机出车状态_m=get_driver_info
+
+note right of dapi
+降级：可以查svc服务
+end note
+
+dapi->Apollo: 1.2 获取order_dispatch_config
+
+
+dapi-> driver_svc: 1.3 司机健康状况driver.health.check
+
+note right of dapi
+降级：返回true，司机健康
+end note
+
+dapi-> dcore: 1.4 更新司机版本号_m=updateVersion
+
+note right of dapi
+降级：有损降级，可能存在一段时间司机版本号对不上的情况，再次进入会刷新
+end note
+
+dapi->abTest: 1.5 获取订单触达实验结果getHitExp
+
+note right of dapi
+降级：走老版本
+end note
+
+dapi->dcore: 1.6 获取订单排序实验结果getHitExp
+
+note right of dapi
+降级：走老版本
+end note
+
+alt 出车状态==已出车 && 健康情况==false
+    dapi-> dcore: 2. 收车_m=set_duty
+end
+
+return
+@enduml
